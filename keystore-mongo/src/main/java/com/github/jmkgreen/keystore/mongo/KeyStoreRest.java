@@ -41,7 +41,7 @@ public class KeyStoreRest {
     @Path("create-new-keystore")
     public void createNewKeyStore(@QueryParam("name") String name, @QueryParam("password") String password) throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException {
         KeyStore store = KeyStore.getInstance("JCEKS");
-        store.load(null, null);
+        store.load(null, password.toCharArray());
         keyStoreRepository.save(name, password.toCharArray(), store);
     }
 
@@ -57,7 +57,7 @@ public class KeyStoreRest {
         LOG.info("Creating a new key within a store currently holding " + store.size() + " keys.");
         AesCipherService cipherService = new AesCipherService();
         Key key = cipherService.generateNewKey(256);
-        store.setKeyEntry(keyName, key.getEncoded(), null);
+        store.setKeyEntry(keyName, key, keyPassword.toCharArray(), null);
         keyStoreRepository.createOrUpdate(keystoreName, password.toCharArray(), store);
         LOG.info("Stored Key within a KeyStore currently holding " + store.size() + " keys.");
     }
